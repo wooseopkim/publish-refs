@@ -1,0 +1,140 @@
+name: Build tags
+
+on:
+  workflow_call:
+    inputs:
+      tags:
+        required: true
+        type: string
+      github-repository:
+        required: true
+        type: string
+      dockerhub-repository:
+        required: true
+        type: string
+      pre-build-script:
+        required: false
+        type: string
+        default: ''
+      post-build-script:
+        required: false
+        type: string
+        default: ''
+      push-image:
+        required: false
+        type: boolean
+        default: false
+      platforms:
+        required: false
+        type: string
+      docker-context:
+        required: false
+        type: string
+        default: .
+      dockerfile:
+        required: false
+        type: string
+        default: Dockerfile
+    secrets:
+      dockerhub-username:
+        required: false
+      dockerhub-token:
+        required: false
+
+env:
+  CHECKOUT_PATH: source
+  ASSERT_NOT_EQUALS: ${{ github.workspace }}/scripts/assert_equals
+  RUN_WITH_ENV: ${{ github.workspace }}/scripts/run_with_env
+
+jobs:
+  check:
+    if: inputs.push-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check inputs
+        env:
+          DOCKERHUB_REPOSITORY: ${{ inputs.dockerhub-repository }}
+        run: |
+          $ASSERT_NOT_EQUALS "" "$DOCKERHUB_REPOSITORY"
+      - name: Check secrets
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.dockerhub-username }}
+          DOCKERHUB_TOKEN: ${{ secrets.dockerhub-token }}
+        run: |
+          $ASSERT_NOT_EQUALS "" "$DOCKERHUB_USERNAME"
+          $ASSERT_NOT_EQUALS "" "$DOCKERHUB_TOKEN"
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      # The official docs: "A matrix will generate a maximum of 256 jobs per workflow run."
+      # See https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#using-a-matrix-strategy
+      # Using different values here because you'd want to push images sequentially but test in parallel
+      max-parallel: ${{ inputs.push-image && 1 || 256 }}
+      matrix:
+        tag: ${{ fromJSON(inputs.tags) }}
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v3
+      - name: Checkout target repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.github-repository }}
+          ref: ${{ matrix.tag }}
+          fetch-depth: 0
+          path: ${{ env.CHECKOUT_PATH }}
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        continue-on-error: true
+        with:
+          name: ${{ github.repository_owner }}_${{ github.event.repository.name }}_artifacts
+          path: /tmp
+      - name: Untar artifacts
+        run: |
+          mkdir ~/artifacts
+          tar -xf /tmp/artifacts.tar -C ~/artifacts
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: ${{ inputs.platforms }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Run pre-build script
+        working-directory: ${{ env.CHECKOUT_PATH }}
+        env:
+          IMAGE: ${{ inputs.dockerhub-repository }}
+          TAG: ${{ steps.tag.outputs.value }}
+        run: |
+          ${{ inputs.pre-build-script }}
+      - name: Create tag for Docker image
+        id: tag
+        env:
+          GIT_TAG: ${{ matrix.tag }}
+        run: |
+          DOCKER_TAG=$(echo $GIT_TAG | sed 's/^\(refs\/tags\/\)\?v\?//')
+          echo value=$DOCKER_TAG >> $GITHUB_OUTPUT
+      - if: inputs.push-image
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        id: image
+        with:
+          context: ${{ env.CHECKOUT_PATH }}/${{ inputs.docker-context }}
+          file: ${{ env.CHECKOUT_PATH }}/${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platforms }}
+          push: ${{ inputs.push-image }}
+          load: ${{ !inputs.push-image }}
+          tags: |
+            ${{ inputs.dockerhub-repository }}:${{ steps.tag.outputs.value }}
+            ${{ inputs.dockerhub-repository }}:latest
+      - name: Run post-build script
+        working-directory: ${{ env.CHECKOUT_PATH }}
+        env:
+          IMAGE: ${{ inputs.dockerhub-repository }}
+          TAG: ${{ steps.tag.outputs.value }}
+        run: |
+          ${{ inputs.post-build-script }}

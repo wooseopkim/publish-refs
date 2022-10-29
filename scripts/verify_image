@@ -1,0 +1,11 @@
+#!/bin/sh
+
+ARGS=$1
+IMAGE=$2
+REPO=$(echo $IMAGE | cut -d ':' -f 1)
+CONTAINER=$(echo $REPO | cut -d '/' -f 1)
+COMMAND=$3
+
+docker run --rm --name $CONTAINER $ARGS $IMAGE $COMMAND
+docker ps
+docker stop $CONTAINER

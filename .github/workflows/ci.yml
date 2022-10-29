@@ -1,0 +1,53 @@
+name: Test if the workflow works as intended
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    - reopened
+
+env:
+  CHECKOUT_PATH: source
+
+jobs:
+  prepare-scripts:
+    name: Upload scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Tar scripts
+        run: |
+          tar -cvf /tmp/artifacts.tar ./scripts/*
+      - name: Upload scripts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.repository_owner }}_${{ github.event.repository.name }}_artifacts
+          path: /tmp/artifacts.tar
+  test:
+    strategy:
+      matrix:
+        include:
+          - github-repository: docker-library/hello-world
+            dockerhub-repository: my/hello-world
+            tags: "[\"master\"]"
+            docker-context: amd64/hello-world
+            dockerfile: amd64/hello-world/Dockerfile
+    needs: [prepare-scripts]
+    name: Should successfully build images with given tags
+    uses: ./.github/workflows/workflow.yml
+    with:
+      tags: ${{ matrix.tags }}
+      github-repository: ${{ matrix.github-repository }}
+      dockerhub-repository: ${{ matrix.dockerhub-repository }}
+      post-build-script: |
+        VERIFY_IMAGE=~/artifacts/scripts/verify_image
+        $VERIFY_IMAGE '-d' $IMAGE:$TAG ''
+      push-image: false
+      platforms: linux/amd64
+      docker-context: ${{ matrix.docker-context }}
+      dockerfile: ${{ matrix.dockerfile }}
