@@ -24,10 +24,10 @@ This is a GitHub Actions workflow to publish images built from the given tags of
 
 ```yaml
 jobs:
+  # When using custom scripts, you may want to upload artifacts.
   upload-artifacts:
     runs-on: ubuntu-latest
     steps:
-      # When using custom scripts, you may want to upload artifacts.
       - name: Checkout
         uses: actions/checkout@v3
       - name: Tar scripts
