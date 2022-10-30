@@ -65,16 +65,6 @@ jobs:
           ref: ${{ matrix.tag }}
           fetch-depth: 0
           path: ${{ env.CHECKOUT_PATH }}
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: ${{ github.repository_owner }}_${{ github.event.repository.name }}_artifacts
-          path: /tmp
-      - name: Untar artifacts
-        run: |
-          mkdir ~/artifacts
-          tar -xf /tmp/artifacts.tar -C ~/artifacts
       - name: Set up QEMU
         id: qemu
         uses: docker/setup-qemu-action@v2
@@ -83,7 +73,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Run pre-build script
-        working-directory: ${{ env.CHECKOUT_PATH }}
         env:
           IMAGE: ${{ inputs.dockerhub-repository }}
           TAG: ${{ steps.tag.outputs.value }}
@@ -115,7 +104,6 @@ jobs:
             ${{ inputs.dockerhub-repository }}:${{ steps.tag.outputs.value }}
             ${{ inputs.dockerhub-repository }}:latest
       - name: Run post-build script
-        working-directory: ${{ env.CHECKOUT_PATH }}
         env:
           IMAGE: ${{ inputs.dockerhub-repository }}
           TAG: ${{ steps.tag.outputs.value }}

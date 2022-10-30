@@ -24,29 +24,18 @@ This is a GitHub Actions workflow to publish images built from the given tags of
 
 ```yaml
 jobs:
-  # When using custom scripts, you may want to upload artifacts.
-  upload-artifacts:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Tar scripts
-        run: |
-          tar -cvf /tmp/artifacts.tar ./scripts/*
-      - name: Upload scripts
-        uses: actions/upload-artifact@v3
-        with:
-          name: wooseopkim_publish-tags_artifacts
-          path: /tmp/artifacts.tar
   build:
     name: Build `dani-garcia/vaultwarden`
     uses: wooseopkim/publish-tags/workflow.yml@v1
     with:
       tags: '["1.26.0", "1.16.2"]'
       github-repository: dani-garcia/vaultwarden
-      # Artifacts are available under the directory `~/artifacts`.
+      # IMAGE, TAG, CHECKOUT_PATH are injected
+      pre-build-script: |
+        ls -R $CHECKOUT_PATH and you can access your
+      # You can access files in your caller repository because this workflow `checkout`s for you.
       post-build-script: |
-        ~/artifacts/scripts/do_something
+        ./scripts/do_something $IMAGE $TAG
       push-image: false
       platforms: linux/amd64
       dockerfile: docker/amd64/Dockerfile.alpine
