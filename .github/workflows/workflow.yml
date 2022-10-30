@@ -64,6 +64,7 @@ jobs:
           $ASSERT_NOT_EQUALS "" "$DOCKERHUB_USERNAME"
           $ASSERT_NOT_EQUALS "" "$DOCKERHUB_TOKEN"
   build:
+    needs: [check]
     runs-on: ubuntu-latest
     strategy:
       # The official docs: "A matrix will generate a maximum of 256 jobs per workflow run."
