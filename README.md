@@ -27,8 +27,6 @@ jobs:
   upload-artifacts:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       # When using custom scripts, you may want to upload artifacts.
       - name: Checkout
         uses: actions/checkout@v3
