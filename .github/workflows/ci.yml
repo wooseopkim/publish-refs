@@ -48,7 +48,7 @@ jobs:
       post-build-script: |
         VERIFY_IMAGE=~/artifacts/scripts/verify_image
         $VERIFY_IMAGE '-d' $IMAGE:$TAG ''
-      push-image: ${{ inputs.push-image }}
+      push-image: ${{ inputs.push-image == 'true' }}
       platforms: linux/amd64
       docker-context: ${{ matrix.docker-context }}
       dockerfile: ${{ matrix.dockerfile }}
