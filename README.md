@@ -1,4 +1,4 @@
-# Publish Tags Action
+# Publish Tags Workflow
 
 ## Summary
 
