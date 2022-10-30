@@ -45,40 +45,7 @@ env:
   CHECKOUT_PATH: source
 
 jobs:
-  check:
-    if: inputs.push-image
-    runs-on: ubuntu-latest
-    env:
-      ASSERT_NOT_EMPTY: |
-        assert_not_empty() {
-          ACTUAL="$1"
-
-          if [ "$ACTUAL" == '' ]; then
-            echo '::error::Not expected empty value'
-            exit 1
-          fi
-          echo "::debug::'$ACTUAL' is not empty"
-        }
-        assert_not_empty
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Check inputs
-        env:
-          DOCKERHUB_REPOSITORY: ${{ inputs.dockerhub-repository }}
-        shell: sh
-        run: |
-          $ASSERT_NOT_EMPTY "$DOCKERHUB_REPOSITORY"
-      - name: Check secrets
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.dockerhub-username }}
-          DOCKERHUB_TOKEN: ${{ secrets.dockerhub-token }}
-        shell: sh
-        run: |
-          $ASSERT_NOT_EMPTY "$DOCKERHUB_USERNAME"
-          $ASSERT_NOT_EMPTY "$DOCKERHUB_TOKEN"
   build:
-    needs: [check]
     runs-on: ubuntu-latest
     strategy:
       # The official docs: "A matrix will generate a maximum of 256 jobs per workflow run."
