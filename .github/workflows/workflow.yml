@@ -43,7 +43,7 @@ on:
 
 env:
   CHECKOUT_PATH: source
-  ASSERT_NOT_EQUALS: ${{ github.workspace }}/scripts/assert_equals
+  ASSERT_NOT_EQUALS: ${{ github.workspace }}/scripts/assert_not_equals
   RUN_WITH_ENV: ${{ github.workspace }}/scripts/run_with_env
 
 jobs:
