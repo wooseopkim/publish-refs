@@ -37,7 +37,7 @@ jobs:
             tags: "[\"master\"]"
             docker-context: amd64/hello-world
             dockerfile: amd64/hello-world/Dockerfile
-            push-image: true
+            push-image: false
     needs: [prepare-scripts]
     name: Should successfully build images with given tags
     uses: ./.github/workflows/workflow.yml
@@ -52,6 +52,3 @@ jobs:
       platforms: linux/amd64
       docker-context: ${{ matrix.docker-context }}
       dockerfile: ${{ matrix.dockerfile }}
-    secrets:
-      dockerhub-username: ''
-      dockerhub-token: ''
