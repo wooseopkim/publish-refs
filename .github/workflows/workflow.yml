@@ -51,6 +51,8 @@ jobs:
     if: inputs.push-image
     runs-on: ubuntu-latest
     steps:
+      - name: Debug
+        run: echo ${{ toJSON(github) }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check inputs
