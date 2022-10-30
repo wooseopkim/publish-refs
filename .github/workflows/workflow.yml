@@ -45,11 +45,6 @@ env:
   CHECKOUT_PATH: source
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print GitHub context
-        run: echo ${{ toJSON(github) }}
   check:
     if: inputs.push-image
     runs-on: ubuntu-latest
