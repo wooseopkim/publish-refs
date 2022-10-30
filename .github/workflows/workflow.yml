@@ -73,6 +73,7 @@ jobs:
       max-parallel: ${{ inputs.push-image && 1 || 256 }}
       matrix:
         tag: ${{ fromJSON(inputs.tags) }}
+      fail-fast: ${{ inputs.push-image == 'true' }}
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v3
