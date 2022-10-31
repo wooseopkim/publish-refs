@@ -32,7 +32,7 @@ jobs:
       github-repository: ${{ matrix.github-repository }}
       dockerhub-repository: ${{ matrix.dockerhub-repository }}
       pre-build-script: |
-        ls -R "$CHECKOUT_PATH"
+        ls "$CHECKOUT_PATH"
       post-build-script: |
         $VERIFY_IMAGE '-d' $IMAGE:$TAG ''
       push-image: ${{ inputs.push-image == 'true' || inputs.push-image == true }}
