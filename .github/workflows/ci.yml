@@ -12,7 +12,6 @@ on:
 
 env:
   CHECKOUT_PATH: source
-  VERIFY_IMAGE: ./scripts/verify_image
 
 jobs:
   test:
@@ -34,8 +33,7 @@ jobs:
       pre-build-script: |
         ls "$CHECKOUT_PATH"
       post-build-script: |
-        echo "$VERIFY_IMAGE"
-        $VERIFY_IMAGE '-d' $IMAGE:$TAG ''
+        ./scripts/verify_image '-d' $IMAGE:$TAG ''
       push-image: ${{ inputs.push-image == 'true' || inputs.push-image == true }}
       platforms: linux/amd64
       docker-context: ${{ matrix.docker-context }}

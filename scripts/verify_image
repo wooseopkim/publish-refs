@@ -6,8 +6,6 @@ REPO=$(echo $IMAGE | cut -d ':' -f 1)
 CONTAINER=$(echo $REPO | cut -d '/' -f 1)
 COMMAND="$3"
 
-echo "$ARGS, $IMAGE, $REPO, $CONTAINER, $COMMAND"
-
 docker run --rm --name $CONTAINER $ARGS $IMAGE $COMMAND
 docker ps
 docker stop $CONTAINER
