@@ -34,6 +34,7 @@ jobs:
       pre-build-script: |
         ls "$CHECKOUT_PATH"
       post-build-script: |
+        echo "$VERIFY_IMAGE"
         $VERIFY_IMAGE '-d' $IMAGE:$TAG ''
       push-image: ${{ inputs.push-image == 'true' || inputs.push-image == true }}
       platforms: linux/amd64
