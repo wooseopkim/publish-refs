@@ -82,7 +82,7 @@ jobs:
       - name: Create tag for Docker image
         id: tag
         env:
-          GIT_TAG: ${{ matrix.tag }}
+          GIT_TAG: ${{ matrix.ref }}
         run: |
           DOCKER_TAG=$(echo $GIT_TAG | sed 's/^\(refs\/[^\/]\+\/\)\?//')
           echo value=$DOCKER_TAG >> $GITHUB_OUTPUT
