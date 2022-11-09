@@ -1,8 +1,8 @@
-# Publish Tags Workflow
+# Publish Refs Workflow
 
 ## Summary
 
-This is a GitHub Actions workflow to publish images built from the given tags of a GitHub repository.
+This is a GitHub Actions workflow to publish images built from the given refs of a GitHub repository.
 
 ## User Guide
 
@@ -10,7 +10,7 @@ This is a GitHub Actions workflow to publish images built from the given tags of
 
 |NAME|REQUIRED|EXAMPLE|
 |-|-|-|
-|tags|true|`'["1.0.0", "1.1.0", "1.2.0"]'`|
+|refs|true|`'["1.0.0", "1.1.0", "1.2.0"]'`|
 |github-repository|true|`original/repository`|
 |dockerhub-repository|true|`your/repository`|
 |pre-build-script|false|`echo starting`|
@@ -26,9 +26,9 @@ This is a GitHub Actions workflow to publish images built from the given tags of
 jobs:
   build:
     name: Build `dani-garcia/vaultwarden`
-    uses: wooseopkim/publish-tags/workflow.yml@v1
+    uses: wooseopkim/publish-refs/workflow.yml@v1
     with:
-      tags: '["1.26.0", "1.16.2"]'
+      refs: '["1.26.0", "1.16.2"]'
       github-repository: dani-garcia/vaultwarden
       # IMAGE, TAG, CHECKOUT_PATH are injected
       pre-build-script: |
@@ -51,6 +51,6 @@ This action is made for personal use and functions are limited. For example, you
 
 ## See Also
 
-This workflow is intended to accept outputs from [`unpublished-tags`](https://github.com/marketplace/actions/unpublished-tags) action as `tags` input.
+This workflow is intended to accept outputs from [`unpublished-tags`](https://github.com/marketplace/actions/unpublished-tags) action as `refs` input.
 
 To better understand how the workflow works, see [`./workflow.yml`](./workflow.yml) and refer to actions this workflow calls.

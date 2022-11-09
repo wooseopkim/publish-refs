@@ -20,14 +20,14 @@ jobs:
         include:
           - github-repository: docker-library/hello-world
             dockerhub-repository: my/hello-world
-            tags: "[\"master\"]"
+            refs: "[\"480c62c690c0af4427372cf7f0de11da4e00e6c5\"]"
             docker-context: amd64/hello-world
             dockerfile: amd64/hello-world/Dockerfile
             push-image: false
-    name: Should successfully build images with given tags
+    name: Should successfully build images with given refs
     uses: ./.github/workflows/workflow.yml
     with:
-      tags: ${{ matrix.tags }}
+      refs: ${{ matrix.refs }}
       github-repository: ${{ matrix.github-repository }}
       dockerhub-repository: ${{ matrix.dockerhub-repository }}
       pre-build-script: |
