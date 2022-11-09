@@ -46,6 +46,7 @@ env:
 
 jobs:
   build:
+    if: ${{ inputs.refs != '[]' }}
     runs-on: ubuntu-latest
     strategy:
       # The official docs: "A matrix will generate a maximum of 256 jobs per workflow run."
