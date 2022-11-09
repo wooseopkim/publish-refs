@@ -53,7 +53,7 @@ jobs:
       # Using different values here because you'd want to push images sequentially but test in parallel
       max-parallel: ${{ inputs.push-image && 1 || 256 }}
       matrix:
-        tag: ${{ fromJSON(inputs.refs) }}
+        ref: ${{ fromJSON(inputs.refs) }}
       fail-fast: ${{ inputs.push-image }}
     steps:
       - name: Checkout this repository
@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ inputs.github-repository }}
-          ref: ${{ matrix.tag }}
+          ref: ${{ matrix.ref }}
           fetch-depth: 0
           path: ${{ env.CHECKOUT_PATH }}
       - name: Set up QEMU
