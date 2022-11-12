@@ -84,7 +84,7 @@ jobs:
         env:
           GIT_TAG: ${{ matrix.ref }}
         run: |
-          DOCKER_TAG=$(echo $GIT_TAG | sed 's/^\(refs\/[^\/]\+\/\)\?//')
+          DOCKER_TAG=$(echo $GIT_TAG | sed 's/^\(refs\/\(tags\/v\|[^/]\+\/\)\)\?//')
           echo value=$DOCKER_TAG >> $GITHUB_OUTPUT
       - if: inputs.push-image
         name: Login to Docker Hub
