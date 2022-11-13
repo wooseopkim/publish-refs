@@ -100,7 +100,6 @@ jobs:
           file: ${{ env.CHECKOUT_PATH }}/${{ inputs.dockerfile }}
           platforms: ${{ inputs.platforms }}
           push: ${{ inputs.push-image }}
-          load: ${{ !inputs.push-image }}
           tags: |
             ${{ inputs.dockerhub-repository }}:${{ steps.tag.outputs.value }}
             ${{ inputs.dockerhub-repository }}:latest
