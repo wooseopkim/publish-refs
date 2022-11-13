@@ -48,6 +48,11 @@ jobs:
   build:
     if: ${{ inputs.refs != '[]' }}
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     strategy:
       # The official docs: "A matrix will generate a maximum of 256 jobs per workflow run."
       # See https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#using-a-matrix-strategy
@@ -73,6 +78,8 @@ jobs:
           platforms: ${{ inputs.platforms }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: network=host
       - name: Run pre-build script
         env:
           IMAGE: ${{ inputs.dockerhub-repository }}
@@ -92,14 +99,23 @@ jobs:
         with:
           username: ${{ secrets.dockerhub-username }}
           password: ${{ secrets.dockerhub-token }}
-      - name: Build and push
+      - name: Build and push images
         uses: docker/build-push-action@v3
-        id: image
         with:
           context: ${{ env.CHECKOUT_PATH }}/${{ inputs.docker-context }}
           file: ${{ env.CHECKOUT_PATH }}/${{ inputs.dockerfile }}
           platforms: ${{ inputs.platforms }}
           push: ${{ inputs.push-image }}
+          tags: |
+            ${{ inputs.dockerhub-repository }}:${{ steps.tag.outputs.value }}
+            ${{ inputs.dockerhub-repository }}:latest
+      - name: Build and load test image
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ env.CHECKOUT_PATH }}/${{ inputs.docker-context }}
+          file: ${{ env.CHECKOUT_PATH }}/${{ inputs.dockerfile }}
+          platforms: linux/amd64
+          load: true
           tags: |
             ${{ inputs.dockerhub-repository }}:${{ steps.tag.outputs.value }}
             ${{ inputs.dockerhub-repository }}:latest
