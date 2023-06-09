@@ -32,7 +32,7 @@ jobs:
       github-repository: dani-garcia/vaultwarden
       # IMAGE, TAG, CHECKOUT_PATH are injected
       pre-build-script: |
-        ls -R $CHECKOUT_PATH and you can access your
+        ls -R $CHECKOUT_PATH
       # You can access files in your caller repository because this workflow `checkout`s for you.
       post-build-script: |
         ./scripts/do_something $IMAGE $TAG
